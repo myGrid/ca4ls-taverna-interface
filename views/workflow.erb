@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<response>
+  <workflow>
+    <%= partial(:workflow_head, :locals => { :workflow => workflow }) %>
+    <version><%= workflow.version %></version>
+    <licence><%= workflow.licence_name %></licence>
+    <tags>
+      <% workflow.tag_list.each do |tag| %>
+        <tag><%= tag %></tag>
+      <% end %>
+    </tags>
+    <inputs count="<%= workflow.inputs_hash.size %>">
+      <%= partial(:input, :collection => workflow.inputs_hash) %>
+    </inputs>
+    <outputs count="<%= workflow.outputs_hash.size %>">
+      <%= partial(:output, :collection => workflow.outputs_hash) %>
+    </outputs>
+    <activities count="<%= workflow.activities_hash.size %>">
+      <%= partial(:activity, :collection => workflow.activities_hash, :locals => { :workflow => workflow }) %>
+    </activities>
+  </workflow>
+</response>

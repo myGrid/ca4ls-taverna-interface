@@ -1,7 +1,19 @@
-Cloud Analytics for Life Sciences
----------------------------------
+= Cloud Analytics for Life Sciences
 
-Taverna Server Wrangler
------------------------
+== Taverna Server Wrangler
+
+Authors::   Robert Haines
+Contact::   mailto:rhaines@manchester.ac.uk
+Licence::   BSD (See LICENCE or http://www.opensource.org/licenses/bsd-license.php)
+Copyright:: (c) 2011, 2012 The University of Manchester, UK
+
+== Synopsis
 
 A simple interface to Taverna Server for the CA4LS infrastructure.
+
+== Dependencies
+
+All of these can be installed via <tt>bundler</tt>:
+
+ $ gem install bundler
+ $ bundle install

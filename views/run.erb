@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<response>
+  <run>
+    <%= partial(:run_head, :locals => { :run => run }) %>
+    <starttime><%= run.starttime.iso8601 %></starttime>
+    <endtime><%= run.finishtime.iso8601 unless run.finishtime.nil? %></endtime>
+    <inputs count="<%= run.inputs.size %>">
+      <%= partial(:run_input, :collection => run.inputs) %>
+    </inputs>
+    <outputs count="<%= run.outputs.size %>">
+      <%= partial(:run_output, :collection => run.outputs) %>
+    </outputs>
+    <activities count="<%= workflow.activities_hash.size %>">
+      <%= partial(:run_activity, :collection => workflow.activities_hash, :locals => { :run => run }) %>
+    </activities>
+  </run>
+</response>

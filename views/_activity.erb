@@ -1,0 +1,7 @@
+<activity>
+  <id><%= activity[0] %></id>
+  <title><%= activity[1][:name] %></title>
+  <description><%= activity[1][:description] %></description>
+  <author><%= workflow.author %></author>
+  <publishedtime><%= workflow.created_at.iso8601 %></publishedtime>
+</activity>

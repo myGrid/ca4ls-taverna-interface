@@ -1,0 +1,123 @@
+#!/usr/bin/env ruby
+# Copyright (c) 2011, 2012 The University of Manchester, UK.
+#
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#
+#  * Redistributions of source code must retain the above copyright notice,
+#    this list of conditions and the following disclaimer.
+#
+#  * Redistributions in binary form must reproduce the above copyright notice,
+#    this list of conditions and the following disclaimer in the documentation
+#    and/or other materials provided with the distribution.
+#
+#  * Neither the names of The University of Manchester nor the names of its
+#    contributors may be used to endorse or promote products derived from this
+#    software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+#
+# Author: Robert Haines
+
+require 'rubygems'
+require 'bundler/setup'
+require 'lib/wrangler'
+require 'lib/bin-support'
+require 'sinatra/activerecord'
+require 't2flow/model'
+require 't2flow/parser'
+
+filename = ARGV[0]
+
+workflow = T2Flow::Parser.new.parse(File.read(filename))
+
+Workflow.create do |w|
+  w.uuid         = workflow.model_id
+
+  # Ask user for this stuff if it's not in the t2flow file.
+  w.title        = ask_user_if_empty("Workflow empty",
+    workflow.annotations.titles)
+  w.name         = workflow.annotations.name
+  w.description  = ask_user_if_empty("Workflow description",
+    workflow.annotations.descriptions)
+  w.author       = ask_user_if_empty("Workflow author",
+    workflow.annotations.authors)
+  w.filename     = File.basename(filename)
+
+  # Ask user for this stuff.
+  w.version      = ask_user("Version number", "1.0").to_f
+  w.licence_name = ask_user("Licence for this workflow", "BSD")
+  w.tag_list     = ask_user_for_list("Enter a tag for this workflow")
+
+  # Loop through sources here. Some maybe "fake" outputs.
+  inputs = {}
+  outputs = {}
+  workflow.sources.each do |input|
+    name = input.name.to_sym
+    confirm = ask_user("\nIs input #{name} actually a fake output?")
+    if confirm.match /y|Y|YES|yes|Yes/
+      outputs[name] = {}
+      outputs[name][:name] =
+        ask_user("Output '#{name.to_s}' readable name", name.to_s)
+      outputs[name][:description] = ask_user_if_empty(
+        "Output '#{name.to_s}' description", input.descriptions)
+      outputs[name][:type] =
+        ask_user("What data type is output '#{name.to_s}'", "string").to_sym
+      outputs[name][:fake] = true
+    else
+      inputs[name] = {}
+      inputs[name][:name] =
+        ask_user("Input '#{name.to_s}' readable name", name.to_s)
+      inputs[name][:description] = ask_user_if_empty(
+        "Input '#{name.to_s}' description", input.descriptions)
+      inputs[name][:type] =
+        ask_user("What data type is input '#{name.to_s}'", "string").to_sym
+      inputs[name][:example] = ask_user_if_empty(
+        "Example input value", input.example_values)
+    end
+  end
+  w.inputs_hash  = inputs
+
+  # Loop through sinks here.
+  workflow.sinks.each do |output|
+    name = output.name.to_sym
+    outputs[name] = {}
+    outputs[name][:name] =
+      ask_user("Output '#{name.to_s}' readable name", name.to_s)
+    outputs[name][:description] = ask_user_if_empty(
+      "Output '#{name.to_s}' description", output.descriptions)
+    outputs[name][:type] =
+      ask_user("What data type is output '#{name.to_s}'", "string").to_sym
+    outputs[name][:fake] = false
+  end
+  w.outputs_hash = outputs
+
+  # Loop through activities here.
+  activities = {}
+  workflow.processors.each do |activity|
+    unless activity.type == "stringconstant"
+      name = activity.name().to_sym
+      confirm = ask_user("\nDo you want to include the #{name} activity?")
+      if confirm.match /y|Y|YES|yes|Yes/
+        activities[name] = {}
+        activities[name][:name] =
+          ask_user("Activity '#{name.to_s}' readable name", name.to_s)
+        activities[name][:description] = ask_user_if_empty(
+          "Activity '#{name.to_s}' description", activity.description)
+      end
+    end
+  end
+  w.activities_hash = activities
+end
