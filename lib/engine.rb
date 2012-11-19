@@ -44,11 +44,11 @@ module Wrangler
 
     helpers Wrangler::Helpers
 
-    def initialize(server, credentials)
+    def initialize(server = nil, credentials = nil)
       super()
 
-      @server = server
-      @creds = credentials
+      @server = server ||= Wrangler.taverna
+      @creds = credentials ||= Wrangler.credentials
     end
 
     configure do

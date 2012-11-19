@@ -32,4 +32,4 @@
 
 require 'lib/wrangler'
 
-run Wrangler::Engine.new(Wrangler.taverna, Wrangler.credentials)
+run Wrangler::Engine.new
