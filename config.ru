@@ -30,6 +30,6 @@
 #
 # Author: Robert Haines
 
-require 'lib/wrangler'
+require './lib/wrangler'
 
 run Wrangler::Engine.new

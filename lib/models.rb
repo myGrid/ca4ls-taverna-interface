@@ -30,9 +30,6 @@
 #
 # Author: Robert Haines
 
-#require 'sinatra/base'
-#require 'sinatra/activerecord'
-
 class Run < ActiveRecord::Base
   validates_uniqueness_of :instance
   validates_presence_of :instance

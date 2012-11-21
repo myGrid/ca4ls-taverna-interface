@@ -30,6 +30,6 @@
 #
 # Author: Robert Haines
 
-require 'lib/wrangler'
+require_relative 'lib/wrangler'
 require 'rubygems'
 require 'sinatra/activerecord/rake'

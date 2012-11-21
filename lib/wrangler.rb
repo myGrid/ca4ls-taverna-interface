@@ -60,4 +60,4 @@ module Wrangler
   module_function :taverna, :credentials
 end
 
-require 'lib/engine'
+require_relative 'engine'

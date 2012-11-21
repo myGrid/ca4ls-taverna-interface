@@ -36,11 +36,13 @@ require 'sinatra/activerecord'
 require 'erb'
 require 'rexml/document'
 require 'rexml/text'
-require 'lib/models'
-require 'lib/helpers'
+require_relative 'models'
+require_relative 'helpers'
 
 module Wrangler
   class Engine < Sinatra::Base
+
+    register Sinatra::ActiveRecordExtension
 
     helpers Wrangler::Helpers
 
@@ -52,7 +54,8 @@ module Wrangler
     end
 
     configure do
-      set :root, $BASE_DIR
+      set :root, BASE_DIR
+      set :database, "sqlite3:///#{BASE_DIR}/#{ENV['RACK_ENV']}.db"
     end
 
     #
