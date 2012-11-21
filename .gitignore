@@ -1,3 +1,4 @@
 *~
 config/taverna.yml
 *.db
+.rvmrc
