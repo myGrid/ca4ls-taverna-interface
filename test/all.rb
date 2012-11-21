@@ -1,4 +1,4 @@
-# Copyright (c) 2011, 2012 The University of Manchester, UK.
+# Copyright (c) 2012 The University of Manchester, UK.
 #
 # All rights reserved.
 #
@@ -30,15 +30,41 @@
 #
 # Author: Robert Haines
 
-source "http://rubygems.org"
+# This must go BEFORE you require the app under test!
+ENV['RACK_ENV'] = "test"
 
-gem "rake", "~> 0.9.2"
-gem "sqlite3", "~> 1.3"
-gem "sinatra", "~> 1.3"
-gem "sinatra-activerecord", "~> 1.0"
-gem "taverna-t2flow", "~> 0.3"
-gem "t2-server", "~> 0.9"
+require_relative '../lib/wrangler'
+require 'test/unit'
+require 'rack/test'
 
-group :development do
-  gem "rack-test", "~> 0.6"
+class WranglerTest < Test::Unit::TestCase
+  include Rack::Test::Methods
+
+  def app
+    Wrangler::Engine.new
+  end
+
+  def test_index
+    get '/' do |r|
+      assert r.ok?
+      assert_equal "application/xml;charset=utf-8", r.content_type
+      assert_not_equal 0, r.content_length
+    end
+  end
+
+  def test_workflows
+    get '/workflows' do |r|
+      assert r.ok?
+      assert_equal "application/xml;charset=utf-8", r.content_type
+      assert_not_equal 0, r.content_length
+    end
+  end
+
+  def test_runs
+    get '/runs' do |r|
+      assert r.ok?
+      assert_equal "application/xml;charset=utf-8", r.content_type
+      assert_not_equal 0, r.content_length
+    end
+  end
 end

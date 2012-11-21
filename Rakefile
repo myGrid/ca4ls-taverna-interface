@@ -32,4 +32,13 @@
 
 require_relative 'lib/wrangler'
 require 'rubygems'
+require 'rake/testtask'
 require 'sinatra/activerecord/rake'
+
+task :default => [:test]
+
+Rake::TestTask.new do |t|
+  t.libs << "test"
+  t.test_files = FileList['test/all.rb']
+  t.verbose = true
+end
