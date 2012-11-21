@@ -55,7 +55,7 @@ module Wrangler
 
     configure do
       set :root, BASE_DIR
-      set :database, "sqlite3:///#{BASE_DIR}/#{ENV['RACK_ENV']}.db"
+      set :database, DATABASE[environment.to_s]
     end
 
     #

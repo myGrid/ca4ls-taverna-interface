@@ -1,4 +1,5 @@
 *~
 config/taverna.yml
-*.db
+config/database.yml
+db/*.sqlite3
 .rvmrc
