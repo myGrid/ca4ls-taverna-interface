@@ -31,8 +31,8 @@
 # Author: Robert Haines
 
 require 'rubygems'
-require 'sinatra/base'
 require 'sinatra/activerecord'
+require 'sinatra/base'
 require 'erb'
 require 'rexml/document'
 require 'rexml/text'
@@ -55,8 +55,11 @@ module Wrangler
 
     configure do
       set :root, BASE_DIR
-      set :database, DATABASE[environment.to_s]
+      set :database, DATABASE[ENVIRONMENT]
     end
+
+    # Log database accesses
+    ActiveRecord::Base.logger = Wrangler::LOGGER
 
     #
     # Routes, &c.

@@ -1,4 +1,4 @@
-# Copyright (c) 2011, 2012 The University of Manchester, UK.
+# Copyright (c) 2012 The University of Manchester, UK.
 #
 # All rights reserved.
 #
@@ -32,46 +32,33 @@
 
 require 'rubygems'
 require 'bundler/setup'
-require 'yaml'
-require 'logger'
-require 't2-server'
+require 'delayed_job_active_record'
 
-module Wrangler
+# Need to fake up some Rails bits for DelayedJob.
 
-  ENVIRONMENT = ENV['RACK_ENV'] || "development"
-  BASE_DIR = File.expand_path(File.join(File.dirname(__FILE__), ".."))
-  CONFIG_DIR = File.join(BASE_DIR, "config")
-  LOG_DIR = File.join(BASE_DIR, "log")
-  DATABASE_FILE = File.join(CONFIG_DIR, "database.yml")
-  TAVERNA_FILE = File.join(CONFIG_DIR, "taverna.yml")
-  WORKFLOW_DIR = File.join(BASE_DIR, "workflows")
-
-  LOGGER = Logger.new(File.join(LOG_DIR, "wrangler.log"))
-
-  CONFIG = begin
-    YAML.load(File.open(TAVERNA_FILE, "r"))
-  rescue ArgumentError => e
-    puts "Could not parse configuration file: #{e.message}"
-    exit(1)
+module Rails
+  module VERSION
+    MAJOR = 3
   end
 
-  DATABASE = begin
-    YAML.load(File.open(DATABASE_FILE, "r"))
-  rescue ArgumentError => e
-    puts "Could not parse database configuration file: #{e.message}"
-    exit(1)
+  class << self
+    attr_accessor :logger
+    attr_accessor :root
+    attr_accessor :env
   end
-
-  def taverna
-    T2Server::Server.new(CONFIG["server"]["url"])
-  end
-
-  def credentials
-    T2Server::HttpBasic.new(CONFIG["credentials"][0], CONFIG["credentials"][1])
-  end
-
-  module_function :taverna, :credentials
 end
+Rails.root = Wrangler::BASE_DIR
+Rails.env = Wrangler::ENVIRONMENT
+Rails.logger = Wrangler::LOGGER
 
-require_relative 'job'
-require_relative 'engine'
+# Configure DelayedJob
+
+Delayed::Worker.backend = :active_record
+Delayed::Worker.destroy_failed_jobs = false
+Delayed::Worker.sleep_delay = 10
+Delayed::Worker.max_attempts = 1
+Delayed::Worker.max_run_time = 1.day
+
+# Fake up the DATABASE_URL variable for DelayedJob
+
+require 'rails-database-url'

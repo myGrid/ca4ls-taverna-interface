@@ -42,3 +42,15 @@ Rake::TestTask.new do |t|
   t.test_files = FileList['test/all.rb']
   t.verbose = true
 end
+
+namespace :jobs do
+  desc "Clear the delayed_job queue."
+  task :clear do
+    Delayed::Job.delete_all
+  end
+
+  desc "Start a delayed_job worker."
+  task :work do
+    Delayed::Worker.new(:min_priority => ENV['MIN_PRIORITY'], :max_priority => ENV['MAX_PRIORITY']).start
+  end
+end
