@@ -114,7 +114,7 @@ module Wrangler
       begin
         doc = REXML::Document.new(request.body.read)
         r_flow = REXML::XPath.first(doc, "//workflow").text
-        r_name = REXML::XPath.first(doc, "//name").text
+        r_name = REXML::XPath.first(doc, "//title").text
         r_desc = REXML::XPath.first(doc, "//description").text
         r_user = REXML::XPath.first(doc, "//author").text
       rescue
