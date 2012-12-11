@@ -1,4 +1,4 @@
-# Copyright (c) 2011, 2012 The University of Manchester, UK.
+# Copyright (c) 2012 The University of Manchester, UK.
 #
 # All rights reserved.
 #
@@ -30,41 +30,12 @@
 #
 # Author: Robert Haines
 
-require 'rubygems'
-require 'bundler/setup'
-require 'yaml'
-require 'logger'
-require_relative 'aws_support'
+credentials:
+  access_key_id: YOUR_ACCESS_KEY_ID
+  secret_access_key: YOUR_SECRET_ACCESS_KEY
 
-module Wrangler
+location:
+  region: eu-west-1
+  zone: eu-west-1b
 
-  ENVIRONMENT = ENV['RACK_ENV'] || "development"
-  BASE_DIR = File.expand_path(File.join(File.dirname(__FILE__), ".."))
-  CONFIG_DIR = File.join(BASE_DIR, "config")
-  LOG_DIR = File.join(BASE_DIR, "log")
-  DATABASE_FILE = File.join(CONFIG_DIR, "database.yml")
-  AWS_FILE = File.join(CONFIG_DIR, "aws.yml")
-  WORKFLOW_DIR = File.join(BASE_DIR, "workflows")
-
-  LOGGER = Logger.new(File.join(LOG_DIR, "wrangler.log"))
-
-  DATABASE = begin
-    YAML.load(File.open(DATABASE_FILE, "r"))
-  rescue ArgumentError => e
-    puts "Could not parse database configuration file: #{e.message}"
-    exit(1)
-  end
-
-  AWS_CONFIG = begin
-    YAML.load(File.open(AWS_FILE, "r"))
-  rescue ArgumentError => e
-    puts "Could not parse AWS configuration file: #{e.message}"
-    exit(1)
-  end
-
-  CLOUD_CONNECTOR = AWS.new(AWS_CONFIG)
-end
-
-require_relative 'job'
-require_relative 'orchestrator'
-require_relative 'engine'
+firewall: SECURITY_GROUP_NAME

@@ -1,4 +1,5 @@
 *~
 config/database.yml
+config/aws.yml
 db/*.sqlite3
 .rvmrc

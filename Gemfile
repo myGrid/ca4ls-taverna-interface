@@ -41,6 +41,7 @@ gem "rails-database-url", "~> 1.0.0"
 gem "daemons", "~> 1.1.9"
 gem "taverna-t2flow", "~> 0.3"
 gem "t2-server", "~> 0.9"
+gem "aws-sdk", "~> 1.7.1"
 
 group :development do
   gem "rack-test", "~> 0.6"

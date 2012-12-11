@@ -160,6 +160,9 @@ module Wrangler
       new_run.state = RUN_STATUS[:initialized]
       new_run.save!
 
+      # Fire off the background task to run this thing
+      Delayed::Job.enqueue Orchestrator.new(new_run, workflow, CLOUD_CONNECTOR)
+
       # Return the link to the new run.
       headers "Location" => "/runs/#{new_run.instance}"
       201
