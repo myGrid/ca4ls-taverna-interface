@@ -2,7 +2,7 @@
 <response>
   <run>
     <%= partial(:run_head, :locals => { :run => run }) %>
-    <starttime><%= run.starttime.iso8601 %></starttime>
+    <starttime><%= run.starttime.iso8601 unless run.starttime.nil? %></starttime>
     <endtime><%= run.finishtime.iso8601 unless run.finishtime.nil? %></endtime>
     <inputs count="<%= run.inputs.size %>">
       <%= partial(:run_input, :collection => run.inputs) %>

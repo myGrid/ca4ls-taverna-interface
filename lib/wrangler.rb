@@ -34,7 +34,6 @@ require 'rubygems'
 require 'bundler/setup'
 require 'yaml'
 require 'logger'
-require 't2-server'
 
 module Wrangler
 
@@ -43,17 +42,9 @@ module Wrangler
   CONFIG_DIR = File.join(BASE_DIR, "config")
   LOG_DIR = File.join(BASE_DIR, "log")
   DATABASE_FILE = File.join(CONFIG_DIR, "database.yml")
-  TAVERNA_FILE = File.join(CONFIG_DIR, "taverna.yml")
   WORKFLOW_DIR = File.join(BASE_DIR, "workflows")
 
   LOGGER = Logger.new(File.join(LOG_DIR, "wrangler.log"))
-
-  CONFIG = begin
-    YAML.load(File.open(TAVERNA_FILE, "r"))
-  rescue ArgumentError => e
-    puts "Could not parse configuration file: #{e.message}"
-    exit(1)
-  end
 
   DATABASE = begin
     YAML.load(File.open(DATABASE_FILE, "r"))
@@ -61,16 +52,6 @@ module Wrangler
     puts "Could not parse database configuration file: #{e.message}"
     exit(1)
   end
-
-  def taverna
-    T2Server::Server.new(CONFIG["server"]["url"])
-  end
-
-  def credentials
-    T2Server::HttpBasic.new(CONFIG["credentials"][0], CONFIG["credentials"][1])
-  end
-
-  module_function :taverna, :credentials
 end
 
 require_relative 'job'

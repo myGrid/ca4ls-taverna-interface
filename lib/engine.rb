@@ -33,6 +33,7 @@
 require 'rubygems'
 require 'sinatra/activerecord'
 require 'sinatra/base'
+require 'uuidtools'
 require 'erb'
 require 'rexml/document'
 require 'rexml/text'
@@ -46,11 +47,8 @@ module Wrangler
 
     helpers Wrangler::Helpers
 
-    def initialize(server = nil, credentials = nil)
+    def initialize
       super()
-
-      @server = server ||= Wrangler.taverna
-      @creds = credentials ||= Wrangler.credentials
     end
 
     configure do
@@ -92,18 +90,6 @@ module Wrangler
     get '/runs/?' do
       stored_runs = Run.all
 
-      runs = {}
-      @server.runs(@creds).each do |run|
-        runs[run.id] = run
-      end
-
-      # update run info?
-      stored_runs.each do |run|
-        next if run.finished?
-        next unless run.on_server?
-        update_run_state(run, runs[run.instance])
-      end
-
       erb(:runs, :locals => {:runs => stored_runs})
     end
 
@@ -130,20 +116,15 @@ module Wrangler
       rescue
         halt 404
       end
-      wf_file = File.read(File.join(Wrangler::WORKFLOW_DIR, workflow.filename))
-      run = @server.create_run(wf_file, @creds)
 
       # Store it in the db
-      r_id = run.id
-      r_created = run.create_time
+      r_id = UUIDTools::UUID.random_create
       new_run = Run.create do |r|
-        r.instance = r_id
-        r.on_server = true
+        r.instance = r_id.to_s
         r.workflow = r_flow
         r.username = r_user
         r.name = r_name
         r.description = r_desc
-        r.createtime = r_created
       end
 
       # Set the inputs, if any
@@ -154,8 +135,6 @@ module Wrangler
           i.name = port
           i.value = value
         end
-
-        run.input_port(port).value = value
       end
 
       # Set the supplied outputs (these are fake outputs really).
@@ -166,8 +145,6 @@ module Wrangler
           o.name = port
           o.value = value
         end
-
-        run.input_port(port).value = value
       end
 
       # Go through each workflow output and set up the run with it, unless it
@@ -180,10 +157,7 @@ module Wrangler
         end
       end
 
-      # Start it running
-      run.start
-      new_run.starttime = run.start_time
-      new_run.state = run_status(run)
+      new_run.state = RUN_STATUS[:initialized]
       new_run.save!
 
       # Return the link to the new run.
@@ -193,7 +167,6 @@ module Wrangler
 
     # DELETE all runs.
     delete '/runs/?' do
-      @server.delete_all_runs(@creds)
       Run.destroy_all
 
       204
@@ -212,12 +185,6 @@ module Wrangler
         pass
       end
 
-      # update run info?
-      unless stored_run.finished?
-        run = @server.run(stored_run.instance, @creds)
-        update_run_state(stored_run, run)
-      end
-
       erb(:run, :locals => {:run => stored_run, :workflow => workflow})
     end
 
@@ -229,8 +196,6 @@ module Wrangler
         pass
       end
 
-      run = @server.run(stored_run.instance, @creds)
-      run.delete unless run.nil?
       stored_run.destroy
 
       204

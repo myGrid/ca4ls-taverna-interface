@@ -1,7 +1,7 @@
 <activity>
   <id><%= run_activity[0] %></id>
   <status><%= run.state %></status>
-  <starttime><%= run.starttime.iso8601 %></starttime>
+  <starttime><%= run.starttime.iso8601 unless run.starttime.nil? %></starttime>
   <endtime><%= run.finishtime.iso8601 unless run.finishtime.nil? %></endtime>
   <% running = (run.state == RUN_STATUS[:running] ? 1 : 0) %>
   <% finished = 1 - running %>
