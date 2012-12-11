@@ -55,8 +55,16 @@ class Output < ActiveRecord::Base
 end
 
 class Workflow < ActiveRecord::Base
+  validates_presence_of :worker_id
+
   serialize :tag_list
   serialize :inputs_hash
   serialize :outputs_hash
   serialize :activities_hash
+
+  belongs_to :worker
+end
+
+class Worker < ActiveRecord::Base
+  validates_uniqueness_of :image_id
 end
