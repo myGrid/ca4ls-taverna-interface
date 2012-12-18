@@ -32,7 +32,7 @@
 # Author: Robert Haines
 
 require_relative '../lib/wrangler'
-require_relative '../lib/bin-support'
+require_relative '../lib/bin_support'
 require 't2flow/model'
 require 't2flow/parser'
 require 'hirb'

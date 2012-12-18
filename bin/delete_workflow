@@ -31,11 +31,8 @@
 #
 # Author: Robert Haines
 
-require 'rubygems'
-require 'bundler/setup'
-require 'lib/wrangler'
-require 'lib/bin-support'
-require 'sinatra/activerecord'
+require_relative '../lib/wrangler'
+require_relative '../lib/bin_support'
 require 'hirb'
 
 puts "Please select a workflow to delete from the database:"

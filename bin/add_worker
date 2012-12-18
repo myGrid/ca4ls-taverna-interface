@@ -32,7 +32,7 @@
 # Author: Robert Haines
 
 require_relative "../lib/wrangler"
-require_relative "../lib/bin-support"
+require_relative "../lib/bin_support"
 
 TAV_PATH = "taverna-server"
 TAV_PORT = "8080"
