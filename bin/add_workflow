@@ -31,15 +31,19 @@
 #
 # Author: Robert Haines
 
-require 'rubygems'
-require 'bundler/setup'
-require 'lib/wrangler'
-require 'lib/bin-support'
-require 'sinatra/activerecord'
+require_relative '../lib/wrangler'
+require_relative '../lib/bin-support'
 require 't2flow/model'
 require 't2flow/parser'
+require 'hirb'
 
 filename = ARGV[0]
+workers = Worker.all
+
+if workers.count == 0
+  puts "You must register at least one Worker before you can register a Workflow."
+  exit 1
+end
 
 workflow = T2Flow::Parser.new.parse(File.read(filename))
 
@@ -60,6 +64,14 @@ Workflow.create do |w|
   w.version      = ask_user("Version number", "1.0").to_f
   w.licence_name = ask_user("Licence for this workflow", "BSD")
   w.tag_list     = ask_user_for_list("Enter a tag for this workflow")
+
+  # Set a worker for this workflow
+  puts "Current workers are: "
+  puts Hirb::Helpers::AutoTable.render workers,
+    :fields => [:id, :image_id, :name], :description=>false,
+    :headers => { :id => "ID", :image_id => "Image ID", :name => "Name" }
+  wrkr           = ask_user("Which number worker do you want to use?").to_i
+  w.worker       = Worker.find(wrkr)
 
   # Loop through sources here. Some maybe "fake" outputs.
   inputs = {}
