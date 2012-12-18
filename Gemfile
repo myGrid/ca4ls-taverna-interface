@@ -39,7 +39,7 @@ gem "sinatra-activerecord", "~> 1.0"
 gem "delayed_job_active_record", "~> 0.3.3"
 gem "rails-database-url", "~> 1.0.0"
 gem "daemons", "~> 1.1.9"
-gem "taverna-t2flow", "~> 0.3"
+gem "taverna-t2flow", "~> 0.4"
 gem "t2-server", "~> 0.9"
 gem "aws-sdk", "~> 1.7.1"
 
