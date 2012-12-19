@@ -34,6 +34,7 @@ source "http://rubygems.org"
 
 gem "rake", "~> 0.9.2"
 gem "sqlite3", "~> 1.3"
+gem "mysql2", "~> 0.3"
 gem "sinatra", "~> 1.3"
 gem "sinatra-activerecord", "~> 1.0"
 gem "delayed_job_active_record", "~> 0.3.3"
